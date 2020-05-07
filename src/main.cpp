@@ -1,6 +1,7 @@
-#include <iostream>
+#include "Clipboard.h"
 
-int main() {
-    std::cout << "Hello World!" << "\n";
-    return 0;
+int main()
+{
+  Clipboard cb;
+  return 0;
 }

@@ -3,14 +3,13 @@
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xfixes.h>
-#include <iostream>
-#include <vector>
+#include <algorithm>
 #include <condition_variable>
 #include <deque>
+#include <iostream>
 #include <mutex>
-#include <vector>
 #include <thread>
-#include <algorithm>
+#include <vector>
 
 class Clipboard {
 private:
@@ -21,6 +20,7 @@ private:
   void listenSelectionChange();
   void get_selection();
   std::vector<std::thread> _threads;
+
 public:
   Clipboard();
   ~Clipboard();

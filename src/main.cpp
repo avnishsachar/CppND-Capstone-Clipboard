@@ -2,10 +2,13 @@
 
 int main(int argc, char **argv) {
   std::string help_text = "This program keeps track of clipboard history.\n"
-  "It has 2 flags: \nUse `-hp [FILEPATH]` to change history file path.\n"
+  "It has 3 flags: \nUse `-h` to print this help message\n"
+  "Use `-hp [FILEPATH]` to change history file path. Default path is `history.txt` in current working directory\n"
   "Use `-ec` to enable experimental copy feature (this may not working as intended sometimes).\n";
   std::string history_path = "history.txt";
   bool enable_copy = false;
+
+  // Parse arguments
   for (int i = 1; i < argc; i++) {
     if (std::string(argv[i]) == "-h") {
       std::cout << help_text;
@@ -20,7 +23,8 @@ int main(int argc, char **argv) {
     } 
     
   }
-  
+
+  // Run application
   QApplication app(argc, argv);
   std::cout << "History path: " << history_path << std::endl;
   std::cout << "Copy " << (enable_copy ? "enabled" : "disabled") << std::endl;

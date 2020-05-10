@@ -64,13 +64,15 @@ public:
 
 private:
   int _width, _height;
-  QListWidget* _clipboard_list;
-  QPushButton* _history_button;
-  std::vector<ClipboardItem*> _clipboard_items;
-  Clipboard _clipboard;
-  std::string _history_path;
-  bool _enable_copy;
-  void closeEvent(QCloseEvent*);
+  QListWidget* _clipboard_list; // List widget
+  QPushButton* _history_button; // Write to history button
+  std::vector<ClipboardItem*> _clipboard_items; // ClipboardItem vector
+  Clipboard _clipboard; // Clipboard object
+  std::string _history_path; // History text save path
+  bool _enable_copy; // Enable experimental copy flag
+  void closeEvent(QCloseEvent*); // Override closeEvent of QWidget
+
+// Public and private Qt slots, see source file for documentation
 public slots:
   void addItem(int);
   void copyItem(int);

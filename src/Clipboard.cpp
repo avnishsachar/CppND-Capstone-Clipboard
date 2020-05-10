@@ -3,6 +3,9 @@
 #include <limits.h>
 
 Clipboard::Clipboard() {
+  /*
+   * Initialize X11 related objects and starts listening selection change
+   */
   _x11_display = XOpenDisplay(NULL);
   unsigned long color = BlackPixel(_x11_display, DefaultScreen(_x11_display));
   _x11_window =
@@ -20,10 +23,14 @@ Clipboard::Clipboard() {
 }
 
 std::string Clipboard::getHistoryItem(int i){
+  // Safely returns item from _history vector
   return i < _history.size() ? _history[i] : "";
 }
 
 void Clipboard::get_selection() {
+  /*
+   * Reads text from new X11 selection, i.e. catches recently copied text.
+   */
   unsigned long ressize, restail;
   int resbits;
   XEvent event;
@@ -51,6 +58,9 @@ void Clipboard::get_selection() {
 }
 
 void Clipboard::set_selection(std::string text) {
+  /*
+   * (Experimental) Set text to X11 selection, may block selection requests
+   */
   sout_mutex.lock();
   _listen = false;
   sout_mutex.unlock();
@@ -112,12 +122,17 @@ void Clipboard::set_selection(std::string text) {
 }
 
 void Clipboard::copyFromHistory(int i) {
-  // std::lock_guard<std::mutex> uLock(sout_mutex);
+  /*
+   * Copies item in history to X11 selection
+   */
   std::cout << "Will copy : " << (i < _history.size() ? _history[i] : "") << "\n-------------\n";
   _threads.emplace_back(std::thread(&Clipboard::set_selection, this, (i < _history.size() ? _history[i] : "")));
 }
 
 void Clipboard::listenSelectionChange() {
+  /*
+   * Listens X11 SelectionOwner change via XFixes extension, and triggers get_selection on change.
+   */
   int event_base, error_base;
   XEvent on_change_event;
 
@@ -139,6 +154,9 @@ void Clipboard::listenSelectionChange() {
 }
 
 Clipboard::~Clipboard() {
+  /*
+   * Joins background threads and destroys X11 connection
+   */
   std::for_each(_threads.begin(), _threads.end(),
                 [](std::thread &t) { t.join(); });
   XDestroyWindow(_x11_display, _x11_window);

@@ -1,6 +1,23 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#include <X11/Xlib.h>
+#include <X11/extensions/Xfixes.h>
+
+#undef Bool
+#undef CursorShape
+#undef Expose
+#undef KeyPress
+#undef KeyRelease
+#undef FocusIn
+#undef FocusOut
+#undef FontChange
+#undef None
+#undef Status
+#undef Unsorted
+
+#include <QObject>
+#include <QApplication>
 #include <QLabel>
 #include <QListWidget>
 #include <QListWidgetItem>
@@ -8,11 +25,17 @@
 #include <QString>
 #include <QWidget>
 #include <QPalette>
+#include <QCloseEvent>
+#include <memory>
+#include "Clipboard.h"
+#include <iostream>
+#include <fstream>
 
 class ClipboardItem : public QWidget {
+  Q_OBJECT
 public:
   ClipboardItem(QWidget *parent, int width = 200, int height = 100,
-                int index = 0, std::string item_data = "");
+                int index = 0, std::string item_data = "", bool enable_copy = false);
   // void setItemData(std::string);
   // std::string getItemData();
 private:
@@ -26,17 +49,33 @@ private:
   std::string _item_data;
   QPushButton *_copy_button;
   QLabel *_item_label;
-  // QPushButton* _delete_button;
+  bool _enable_copy;
+private slots:
+  void handleCopyButton();
+signals:
+  void copyButtonPressed(int);
 };
 
 class ClipboardGUI : public QWidget {
+Q_OBJECT
 public:
-  ClipboardGUI(QWidget *parent = 0);
-  void addClipboardItem(ClipboardItem *&);
+  ClipboardGUI(std::string history_path="history.txt", bool enable_copy=false, QWidget *parent = 0);
+  void addClipboardItem(std::string, int);
 
 private:
   int _width, _height;
-  QListWidget *_clipboard_list;
+  QListWidget* _clipboard_list;
+  QPushButton* _history_button;
+  std::vector<ClipboardItem*> _clipboard_items;
+  Clipboard _clipboard;
+  std::string _history_path;
+  bool _enable_copy;
+  void closeEvent(QCloseEvent*);
+public slots:
+  void addItem(int);
+  void copyItem(int);
+private slots:
+  void handleHistoryButton();
 };
 
 #endif // GRAPHICS_H

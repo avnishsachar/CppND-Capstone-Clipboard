@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(MyProject)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 add_definitions(-std=c++17)
 find_package(X11 REQUIRED)
 
@@ -15,7 +19,7 @@ endif(X11_FOUND)
 set(CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-pthread ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
-file(GLOB project_SRCS src/*.h src/*.cpp)
+file(GLOB project_SRCS  src/*.cpp)
 
 add_executable(ClipBoardNaive ${project_SRCS})
 

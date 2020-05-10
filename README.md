@@ -86,3 +86,4 @@ __Concurrency__
 
 # TODO Fill here
 Copy Icon : https://material.io/resources/icons
+https://doc.qt.io/

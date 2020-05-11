@@ -22,7 +22,7 @@ Clipboard::Clipboard() {
   _threads.emplace_back(std::thread(&Clipboard::listenSelectionChange, this));
 }
 
-std::string Clipboard::getHistoryItem(int i){
+std::string Clipboard::getHistoryItem(int i) {
   // Safely returns item from _history vector
   return i < _history.size() ? _history[i] : "";
 }
@@ -77,8 +77,8 @@ void Clipboard::set_selection(std::string text) {
     XNextEvent(_x11_display, &event);
     std::cout << "Got event\n";
     switch (event.type) {
-    case SelectionRequest:
-      {if (event.xselectionrequest.selection != _CLIPBOARD_ATOM)
+    case SelectionRequest: {
+      if (event.xselectionrequest.selection != _CLIPBOARD_ATOM)
         break;
       XSelectionRequestEvent *xsr = &event.xselectionrequest;
       XSelectionEvent ev = {0};
@@ -92,31 +92,37 @@ void Clipboard::set_selection(std::string text) {
                             PropModeReplace, (unsigned char *)&_XA_STRING, 1);
       } else if (ev.target == _XA_STRING || ev.target == _TEXT_ATOM) {
         std::cout << "String or Text requested\n";
-        R = XChangeProperty(ev.display, ev.requestor, ev.property, _XA_STRING, 8,
-                            PropModeReplace, reinterpret_cast<unsigned char*>(const_cast<char*>(text.c_str())), size);
+        R = XChangeProperty(
+            ev.display, ev.requestor, ev.property, _XA_STRING, 8,
+            PropModeReplace,
+            reinterpret_cast<unsigned char *>(const_cast<char *>(text.c_str())),
+            size);
       } else if (ev.target == _UTF8_ATOM) {
         std::cout << "UTF8 requested\n";
-        R = XChangeProperty(ev.display, ev.requestor, ev.property, _UTF8_ATOM, 8,
-                            PropModeReplace, reinterpret_cast<unsigned char*>(const_cast<char*>(text.c_str())), size);
+        R = XChangeProperty(
+            ev.display, ev.requestor, ev.property, _UTF8_ATOM, 8,
+            PropModeReplace,
+            reinterpret_cast<unsigned char *>(const_cast<char *>(text.c_str())),
+            size);
       } else {
         std::cout << "No match\n";
         ev.property = None;
       }
       if ((R & 2) == 0) {
-      	std::cout << "Sending event, ";
+        std::cout << "Sending event, ";
         XSendEvent(_x11_display, ev.requestor, 0, 0, (XEvent *)&ev);
         std::cout << "Sended event\n";
       }
       std::cout << "Breaking the SelectionRequestCase\n-------------\n";
       break;
-      }
-    case SelectionClear:{
+    }
+    case SelectionClear: {
       std::cout << "SelectionClear requested\n-------------\n";
       sout_mutex.lock();
       _listen = true;
       sout_mutex.unlock();
       return;
-      }
+    }
     }
   }
 }
@@ -125,13 +131,16 @@ void Clipboard::copyFromHistory(int i) {
   /*
    * Copies item in history to X11 selection
    */
-  std::cout << "Will copy : " << (i < _history.size() ? _history[i] : "") << "\n-------------\n";
-  _threads.emplace_back(std::thread(&Clipboard::set_selection, this, (i < _history.size() ? _history[i] : "")));
+  std::cout << "Will copy : " << (i < _history.size() ? _history[i] : "")
+            << "\n-------------\n";
+  _threads.emplace_back(std::thread(&Clipboard::set_selection, this,
+                                    (i < _history.size() ? _history[i] : "")));
 }
 
 void Clipboard::listenSelectionChange() {
   /*
-   * Listens X11 SelectionOwner change via XFixes extension, and triggers get_selection on change.
+   * Listens X11 SelectionOwner change via XFixes extension, and triggers
+   * get_selection on change.
    */
   int event_base, error_base;
   XEvent on_change_event;
@@ -142,14 +151,15 @@ void Clipboard::listenSelectionChange() {
                              XFixesSetSelectionOwnerNotifyMask);
 
   while (true) {
-    if (_listen){
-    XNextEvent(_x11_display, &on_change_event);
-    Window owner =  XGetSelectionOwner(_x11_display, _CLIPBOARD_ATOM);
-    if (on_change_event.type == event_base + XFixesSelectionNotify &&
-        ((XFixesSelectionNotifyEvent *)&on_change_event)->selection ==
-            _CLIPBOARD_ATOM) {
-      get_selection();
-    }}
+    if (_listen) {
+      XNextEvent(_x11_display, &on_change_event);
+      Window owner = XGetSelectionOwner(_x11_display, _CLIPBOARD_ATOM);
+      if (on_change_event.type == event_base + XFixesSelectionNotify &&
+          ((XFixesSelectionNotifyEvent *)&on_change_event)->selection ==
+              _CLIPBOARD_ATOM) {
+        get_selection();
+      }
+    }
   }
 }
 

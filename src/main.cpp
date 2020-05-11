@@ -1,10 +1,13 @@
 #include "Graphics.h"
 
 int main(int argc, char **argv) {
-  std::string help_text = "This program keeps track of clipboard history.\n"
-  "It has 3 flags: \nUse `-h` to print this help message\n"
-  "Use `-hp [FILEPATH]` to change history file path. Default path is `history.txt` in current working directory\n"
-  "Use `-ec` to enable experimental copy feature (this may not working as intended sometimes).\n";
+  std::string help_text =
+      "This program keeps track of clipboard history.\n"
+      "It has 3 flags: \nUse `-h` to print this help message\n"
+      "Use `-hp [FILEPATH]` to change history file path. Default path is "
+      "`history.txt` in current working directory\n"
+      "Use `-ec` to enable experimental copy feature (this may not working as "
+      "intended sometimes).\n";
   std::string history_path = "history.txt";
   bool enable_copy = false;
 
@@ -15,13 +18,12 @@ int main(int argc, char **argv) {
       exit(0);
     } else if (std::string(argv[i]) == "-hp" && (i + 1) < argc) {
       history_path = std::string(argv[++i]);
-    } else if (std::string(argv[i]) == "-ec") { 
+    } else if (std::string(argv[i]) == "-ec") {
       enable_copy = true;
     } else {
       std::cout << help_text;
       exit(0);
-    } 
-    
+    }
   }
 
   // Run application
